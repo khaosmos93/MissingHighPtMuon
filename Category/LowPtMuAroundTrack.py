@@ -229,7 +229,7 @@ Muon :    pT= %(muPt)s    eta= %(muEta)s    phi= %(muPhi)s    isBarrel= %(isBarr
         TrackInfo = '''
 Track :   pT= %(tkPt)s    eta= %(tkEta)s    phi= %(tkPhi)s
           dxy= %(tkDxy)s,    dz= %(tkDz)s,    dPhi= %(tkDPhi)s,    SumPt/Pt= %(selectedTkSumPtOverPt)s'''
-      fout.write(TrackInfo % locals())
+        fout.write(TrackInfo % locals())
         #print "catTk :", "\tpT=", catTk.pt(), "\teta=", catTk.eta(), "\tphi=", catTk.phi(), "\n\t", "\tdxy=", catTk.dxy(PV.position()), "\tdz=", catTk.dz(PV.position()), "\tdPhi = ", abs( catTk.phi()-selectedMuons[0].phi() ), "\t SumPt/Pt : ", selectedTkSumPtOverPt
 
       for met in MET:
