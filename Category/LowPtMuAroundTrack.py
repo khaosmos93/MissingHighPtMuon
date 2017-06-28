@@ -179,7 +179,7 @@ for name, fileName in files:
     if numTkPassed < 1: continue
 
 
-    ### Category : no muon(activity) around probe track ###
+    ### Category : Low pT muon around the track ###
     numTkCategory=0
     categoryTracks=[]
     for selTk in selectedTracks:
