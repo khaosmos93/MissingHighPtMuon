@@ -60,8 +60,8 @@ print "Start!"
 
 for name, fileName in files:
   print "\n\n\n",name," : ", fileName
-  if not printKinematics: fn='LowPtMuAroundProbeEvents_'+name+'.txt'
-  elif printKinematics: fn='LowPtMuAroundProbeKinematics_'+name+'.txt'
+  if not printKinematics: fn='IsolatedProbeEvents_'+name+'.txt'
+  elif printKinematics: fn='IsolatedProbeKinematics_'+name+'.txt'
   fout = open(fn, 'wt')
   eventCount=0
   events = Events(fileName)
@@ -179,21 +179,27 @@ for name, fileName in files:
     if numTkPassed < 1: continue
 
 
-    ### Category : Low pT muon around the track ###
-    numTkCategory=0
+    ### Category : At least one isolated probe ###
+    numIsoTk=0
     categoryTracks=[]
     for selTk in selectedTracks:
-      numMuAroundTk = 0
-      for muu in muons:
-        #if muu.pt() > 30: continue   # no upper bound
-        if dR(muu,selTk) > 0.3: continue
-        numMuAroundTk+=1
-      if numMuAroundTk>1:
-        numTkCategory+=1
+      #Calculate tk isolation of pre-selected track
+      TkSumPtOverPt=-999
+      TkSumPt03 = 0
+      for tkiso in tracks:
+        if (tkiso.pt() == selTk.pt() and
+            tkiso.eta() == selTk.eta() and
+            tkiso.phi() == selTk.phi()
+            ): continue
+        if abs(tkiso.dz(PV.position())) > 0.2: continue
+        if dR(tkiso,selTk) < 0.3:
+          TkSumPt03 += tkiso.pt()
+      TkSumPtOverPt=TkSumPt03/selTk.pt()
+      if TkSumPtOverPt < 0.1:
+        numIsoTk+=1
         categoryTracks.append(selTk)
-    if (vervos): print "number of tracks passing category selection in event: ",numTkCategory
-    if numTkCategory < 1: continue
-
+    if (vervos): print "number of tracks fail isolation in event: ",numIsoTk
+    if numIsoTk < 1: continue
 
 
     if (printKinematics):
@@ -239,13 +245,13 @@ Track :   pT= %(tkPt)s    eta= %(tkEta)s    phi= %(tkPhi)s
         metPhi = met.phi()
         METInfo = '''
 MET :     pT= %(metPt)s,    eta= %(metEta)s,    phi= %(metPhi)s'''
-        fout.write(METInfo % locals() + '\n')
+        fout.write(METInfo % locals() + '\n' )
         #print "MET : pt=", met.pt(), "\t eta=", met.eta(), "\t phi=", met.phi()
 
     run = event.eventAuxiliary().run()
     lumi = event.eventAuxiliary().luminosityBlock()
     ev = event.eventAuxiliary().event()
-    EventID = '%(run)s:%(lumi)s:%(ev)s'    ####[%(eventCount)s]'
+    EventID = '%(run)s:%(lumi)s:%(ev)s'  ###  [%(eventCount)s]'
     fout.write(EventID % locals() + '\n')
     #print "Run:Lumi:Event = ", event.eventAuxiliary().run(), ":", event.eventAuxiliary().luminosityBlock(), ":", event.eventAuxiliary().event()  , "\t [", eventCount, "]"
     if (printKinematics): fout.write('\n')

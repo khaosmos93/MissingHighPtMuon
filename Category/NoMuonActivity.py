@@ -206,15 +206,16 @@ Muon :    pT= %(muPt)s    eta= %(muEta)s    phi= %(muPhi)s    isBarrel= %(isBarr
         fout.write(MuonInfo % locals())
         #print "muon : pT=", selMu.pt(), "\t eta=", selMu.eta(), "\t phi=", selMu.phi(), "\t isBarrel : ", isBarrel, "\tdxy=", selMu.muonBestTrack().dxy(PV.position()), "\tdz=", selMu.muonBestTrack().dz(PV.position())
 
-      selectedTkSumPtOverPt=-999
       for catTk in categoryTracks:
+        selectedTkSumPtOverPt=-999
         TkSumPt = 0
         for tki in tracks:
           if (tki.pt() == catTk.pt() and
               tki.eta() == catTk.eta() and
               tki.phi() == catTk.phi()
               ): continue
-          if dR(tki,tk) < 0.3:
+          if abs(tki.dz(PV.position())) > 0.2: continue
+          if dR(tki,catTk) < 0.3:
             TkSumPt += tki.pt()
         selectedTkSumPtOverPt=TkSumPt/catTk.pt()
 
