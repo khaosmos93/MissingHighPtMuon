@@ -26,19 +26,21 @@ vertices, vertexLabel = Handle("std::vector<reco::Vertex>"), "offlinePrimaryVert
 
 
 files = [
-          ('RunBv2','file:/cms/home/msoh/MissingHighPtMuon/Files/TagMuonSelectionEvents_RunBv2.root'),
-          ('RunC','file:/cms/home/msoh/MissingHighPtMuon/Files/TagMuonSelectionEvents_RunC.root'),
-          ('RunD','file:/cms/home/msoh/MissingHighPtMuon/Files/TagMuonSelectionEvents_RunD.root'),
-          ('RunE','file:/cms/home/msoh/MissingHighPtMuon/Files/TagMuonSelectionEvents_RunE.root'),
-          ('RunF','file:/cms/home/msoh/MissingHighPtMuon/Files/TagMuonSelectionEvents_RunF.root'),
-          ('RunG','file:/cms/home/msoh/MissingHighPtMuon/Files/TagMuonSelectionEvents_RunG.root'),
-          ('RunHv2','file:/cms/home/msoh/MissingHighPtMuon/Files/TagMuonSelectionEvents_RunHv2.root'),
-          ('RunHv3','file:/cms/home/msoh/MissingHighPtMuon/Files/TagMuonSelectionEvents_RunHv3.root'),
+          ('RunBv2','file:/u/user/msoh/MissingHighPtMuon/Files/TagMuonSelectionEvents_RunBv2.root'),
+          ('RunC','file:/u/user/msoh/MissingHighPtMuon/Files/TagMuonSelectionEvents_RunC.root'),
+          ('RunD','file:/u/user/msoh/MissingHighPtMuon/Files/TagMuonSelectionEvents_RunD.root'),
+          ('RunE','file:/u/user/msoh/MissingHighPtMuon/Files/TagMuonSelectionEvents_RunE.root'),
+          ('RunF','file:/u/user/msoh/MissingHighPtMuon/Files/TagMuonSelectionEvents_RunF.root'),
+          ('RunG','file:/u/user/msoh/MissingHighPtMuon/Files/TagMuonSelectionEvents_RunG.root'),
+          ('RunHv2','file:/u/user/msoh/MissingHighPtMuon/Files/TagMuonSelectionEvents_RunHv2.root'),
+          ('RunHv3','file:/u/user/msoh/MissingHighPtMuon/Files/TagMuonSelectionEvents_RunHv3.root'),
 
-          ('DY400_800','file:/cms/home/msoh/MissingHighPtMuon/Files/TagMuonSelectionEvents_DY400_800.root'),
-          ('DY800_1400','file:/cms/home/msoh/MissingHighPtMuon/Files/TagMuonSelectionEvents_DY800_1400.root'),
-          ('DY1400_2300','file:/cms/home/msoh/MissingHighPtMuon/Files/TagMuonSelectionEvents_DY1400_2300.root'),
-          ('DY2300_3500','file:/cms/home/msoh/MissingHighPtMuon/Files/TagMuonSelectionEvents_DY2300_3500.root'),
+          ('WplusJet','file:/u/user/msoh/MissingHighPtMuon/Files/TagMuonSelectionEvents_WplusJet.root'),
+
+          ('DY400_800','file:/u/user/msoh/MissingHighPtMuon/Files/TagMuonSelectionEvents_DY400_800.root'),
+          ('DY800_1400','file:/u/user/msoh/MissingHighPtMuon/Files/TagMuonSelectionEvents_DY800_1400.root'),
+          ('DY1400_2300','file:/u/user/msoh/MissingHighPtMuon/Files/TagMuonSelectionEvents_DY1400_2300.root'),
+          ('DY2300_3500','file:/u/user/msoh/MissingHighPtMuon/Files/TagMuonSelectionEvents_DY2300_3500.root'),
 
           #'file:/cms/home/msoh/MissingHighPtMuon/PE/Files/Mu600/SelectedMuons_RunHv3.root',
           #'file:/cms/home/msoh/MissingHighPtMuon/PE/Files/Mu600/SelectedMuons_RunHv2.root',
@@ -183,6 +185,7 @@ for name, fileName in files:
     numIsoTk=0
     categoryTracks=[]
     for selTk in selectedTracks:
+
       #Calculate tk isolation of pre-selected track
       TkSumPtOverPt=-999
       TkSumPt03 = 0
@@ -192,9 +195,11 @@ for name, fileName in files:
             tkiso.phi() == selTk.phi()
             ): continue
         if abs(tkiso.dz(PV.position())) > 0.2: continue
-        if dR(tkiso,selTk) < 0.3:
+        if abs(tkiso.dxy(PV.position())) > 0.1: continue
+        if (dR(tkiso,selTk) < 0.3 and dR(tkiso,selTk) > 0.01):
           TkSumPt03 += tkiso.pt()
       TkSumPtOverPt=TkSumPt03/selTk.pt()
+
       if TkSumPtOverPt < 0.1:
         numIsoTk+=1
         categoryTracks.append(selTk)
@@ -223,7 +228,8 @@ Muon :    pT= %(muPt)s    eta= %(muEta)s    phi= %(muPhi)s    isBarrel= %(isBarr
               tki.phi() == catTk.phi()
               ): continue
           if abs(tki.dz(PV.position())) > 0.2: continue
-          if dR(tki,catTk) < 0.3:
+          if abs(tki.dxy(PV.position())) > 0.1: continue
+          if (dR(tki,catTk) < 0.3 and dR(tki,catTk) > 0.01):
             TkSumPt += tki.pt()
         selectedTkSumPtOverPt=TkSumPt/catTk.pt()
 
@@ -235,7 +241,7 @@ Muon :    pT= %(muPt)s    eta= %(muEta)s    phi= %(muPhi)s    isBarrel= %(isBarr
         tkDPhi = abs( catTk.phi()-selectedMuons[0].phi() )
         TrackInfo = '''
 Track :   pT= %(tkPt)s    eta= %(tkEta)s    phi= %(tkPhi)s
-          dxy= %(tkDxy)s,    dz= %(tkDz)s,    dPhi= %(tkDPhi)s,    SumPt/Pt= %(selectedTkSumPtOverPt)s'''
+          dxy= %(tkDxy)s,    dz= %(tkDz)s,    dPhi= %(tkDPhi)s,    TkIso= %(selectedTkSumPtOverPt)s'''
         fout.write(TrackInfo % locals())
         #print "catTk :", "\tpT=", catTk.pt(), "\teta=", catTk.eta(), "\tphi=", catTk.phi(), "\n\t", "\tdxy=", catTk.dxy(PV.position()), "\tdz=", catTk.dz(PV.position()), "\tdPhi = ", abs( catTk.phi()-selectedMuons[0].phi() ), "\t SumPt/Pt : ", selectedTkSumPtOverPt
 
